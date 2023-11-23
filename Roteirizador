@@ -3,7 +3,7 @@ global scriptVersion := 4.6
 AutoUpdate()
 
 AutoUpdate() {
-	URL_SCRIPT := "https://chupacabradomain.000webhostapp.com/ChupaCabra/ChupaCabra"
+	URL_SCRIPT := "https://raw.githubusercontent.com/xupiru/ChupaCabra/main/Roteirizador"
 	URL_VERSION := "https://programadordanasa.000webhostapp.com/UpdateRoteirizador"
 
 	whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
