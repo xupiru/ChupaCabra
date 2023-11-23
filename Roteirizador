@@ -1,0 +1,970 @@
+global scriptVersion := 4.6
+
+AutoUpdate()
+
+AutoUpdate() {
+	URL_SCRIPT := "https://chupacabradomain.000webhostapp.com/ChupaCabra/ChupaCabra"
+	URL_VERSION := "https://programadordanasa.000webhostapp.com/UpdateRoteirizador"
+
+	whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	whr.Open("GET", URL_VERSION)
+	whr.Send()
+	onlineVersion := whr.ResponseText
+
+	if (onlineVersion > scriptVersion) 
+	{
+		UrlDownloadToFile, % URL_SCRIPT, % A_ScriptFullPath
+        MsgBox,,, Atualizando, 1
+		Reload
+	}
+}
+
+MsgBox,,, Atualizado V%scriptVersion%, 1
+
+#Persistent
+#NoEnv
+#HotKeyInterval 1
+#MaxHotkeysPerInterval 127
+#InstallKeybdHook
+#UseHook
+#SingleInstance, Force
+
+SetControlDelay, -1
+SetMouseDelay, -1
+SetWinDelay,-1
+SetBatchLines,-1
+
+IniRead, EditUF, %A_ScriptName%, Settings, iniUF
+
+Gui, ProgramGui: Font, s10 bolda Verdana cYellow
+Gui, ProgramGui: Color, Black
+Gui, ProgramGui: add, text, cYellow , Insira o UF da base
+Gui, ProgramGui: add, Checkbox, vMyCheckBox, Mouse On
+Gui, ProgramGui: add, edit, w27 h21 cBlack vUF, %EditUF%
+Gui, ProgramGui: show,, Roterizador
+Return
+
+!z::
+Gui, ProgramGui: Submit, NoHide
+GuiControlGet, MyCheckBox
+sleep, 20
+If (MyCheckBox = 1)
+{
+GoSub, MouseOn
+}
+else if (MyCheckBox = 0)
+{
+GoSub, MouseOff
+}
+return
+
+*F4::
+CicloPm := 0
+Return
+
+*F3::
+CicloPm := 1
+Return
+
+*F5::
+Gosub, Rel
+Return
+
+*F6::
+Pause
+Return
+
+MouseOff:
+  Loop
+  {
+  Gui, ProgramGui: Submit, NoHide
+  NomeMotorista := "`r`n"
+  Destino := "`r`n"
+  LinkStrava := "`r`n"
+  ValKm := "`r`n"
+  ValP := "`r`n"
+  LinkPed := "`r`n"
+  KmMaps := "`r`n"
+  MapsLink := "`r`n"
+  NotValid := 0
+  Nfs := 0
+  OBS := 0
+  EvDivergente := 0
+  sleep, 70
+  send, ^{c}
+  sleep, 100
+  NomeMotorista := ClipBoard
+  sleep, 50
+  if (NomeMotorista = "`r`n")
+  {
+  break
+  }
+  sleep, 50
+  send, {Right}
+  sleep, 100
+  send, ^{c}
+  sleep, 100
+  Destino := ClipBoard
+  sleep, 100
+  ClipBoard := "`r`n"
+  sleep, 100
+  send, {right}
+  sleep, 100
+  send, ^{c}
+  sleep, 100
+  if (Clipboard = "`r`n")
+  {
+  OBS := 0
+  }
+  else if (ClipBoard !="`r`n")
+  {
+  OBS := ClipBoard
+  }
+Sleep, 50
+ClipBoard := "`r`n"
+sleep, 100
+send, {right}
+sleep, 100
+send, ^{c}
+clipwait
+sleep, 100
+if (ClipBoard = "`r`n")
+{
+Nfs := 1
+}
+else if (Clipboard != "`r`n")
+{
+Nfs := 0
+sleep, 20
+LinkStrava := ClipBoard
+sleep, 100
+ClipBoard := "`r`n"
+sleep, 100
+send, {right}
+sleep, 100
+send, ^{c}
+clipwait
+sleep, 100
+ValKm := ClipBoard
+sleep, 100
+if (ValKm = "`r`n")
+{
+EvDivergente := 1
+}
+}
+ClipBoard := "`r`n"
+sleep, 50
+WinActivate, ahk_exe DDSLogistica.exe
+WinWaitActive, ahk_exe DDSLogistica.exe
+sleep, 200
+WinGetTitle, Title, A
+loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 1039, 224, 1110, 240, 0x6782B6, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+  ControlClick, x1096 y259, %Title%,, Left, 1, NA
+  sleep, 100
+  Loop, Parse, % StrSplit(NomeMotorista,"/").1
+{
+  Send, % A_LoopField
+  Sleep, 100
+}
+send, {esc}
+sleep, 250
+ControlClick, x1520 y406, %Title%,, Left, 1, NA
+sleep, 250
+ControlClick, x344 y521, %Title%,, Left, 1, NA
+loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 357, 208, 388, 239, 0xD23D26, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+sleep, 500
+ControlClick, x1180 y739, %Title%,, Left, 1, NA
+sleep, 800
+Loop, Parse, UF, `/
+{
+  Send, % A_LoopField
+  Sleep, 150
+}
+sleep, 150
+send, {esc}
+sleep, 100
+Loop, Parse, Destino, `/
+if (A_LoopField !="`r`n")
+{
+  sleep, 100
+  ControlClick, x1379 y746, %Title%,, Left, 2, NA
+  sleep, 1000
+  Send, % A_LoopField
+  sleep, 1000
+  send, {esc}
+  sleep, 150
+  ControlClick, x1630 y740, %Title%,, Left, 1, NA
+  sleep, 800
+}
+send, {esc}
+sleep, 400
+ControlClick, x667 y425, %Title%,, Left, 1, NA
+if (Nfs = 0)
+{
+if (EvDivergente = 1)
+{
+ControlClick, x1630 y913, %Title%,, Left, 2, NA
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 20
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+KmDiv := StrSplit(ClipBoard,",").1
+sleep, 150
+ValKm := KmDiv
+}
+ControlClick, x469 y948, %Title%,, Left, 2, NA
+sleep, 200
+send, ^{a}
+sleep, 50
+send, %LinkStrava%
+sleep, 200
+ControlClick, x1166 y569, %Title%,, Left, 2, NA
+sleep, 100
+send, ^{a}
+sleep, 50
+send, %ValKm%
+sleep, 100
+ControlClick, x920 y500, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x1598 y500, %Title%,, Left, 2, NA
+sleep, 200
+GoSub, VerificarFaixaValKm
+sleep, 200
+Gosub, VerificarFaixaKmMaps
+sleep, 50
+Gosub, ComparativoFaixas
+sleep, 180
+if (NotValid = 1)
+{
+ControlClick, x827 y845, %Title%,, Left, 1, NA
+sleep, 80
+send, -Strava desconsiderado pois nao atinge o km 
+sleep, 50
+send, {space}
+sleep, 50
+send, %LinkStrava%
+sleep, 80
+ControlClick, x469 y948, %Title%,, Left, 2, NA
+sleep, 80
+send, ^{a}
+sleep, 50
+send, {del}
+sleep, 80
+ControlClick, x1166 y569, %Title%,, Left, 2, NA
+sleep, 80
+send, ^{a}
+sleep, 50
+send, {del}
+}
+}
+if (Nfs = 1)
+{
+ControlClick, x920 y500, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x590 y652, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+PVal := StrSplit(ClipBoard,",").1
+sleep, 25
+if (PVal > 0)
+{
+ValP := ClipBoard
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 50
+ControlClick, x399 y721, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 80
+send, ^{c}
+ClipWait
+LinkPed := ClipBoard
+sleep, 50
+ClipBoard := "`r`n"
+}
+sleep, 50
+ControlClick, x1630 y913, %Title%,, Left, 2, NA
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+KmMaps := ClipBoard
+Sleep, 50
+ClipBoard := "`r`n"
+sleep, 80
+ControlClick, x1300 y951, %Title%,, Left, 2, NA
+sleep, 100
+send, ^{a}
+sleep, 50
+send, ^{c}
+clipwait
+MapsLink := ClipBoard
+sleep, 50
+ClipBoard= "`r`n"
+sleep, 800
+ControlClick, x1180 y739, %Title%,, Left, 1, NA
+sleep, 500
+Loop, Parse, UF, `/
+{
+  Send, % A_LoopField
+  Sleep, 150
+}
+sleep, 150
+send, {ESC}
+sleep, 100
+DestinoNfs := "Não Fez Strava"
+Loop, Parse, DestinoNfs, `/
+if (A_LoopField !="`r`n")
+{
+  ControlClick, x1379 y746, %Title%,, Left, 2, NA
+  sleep, 1000
+  Send, % A_LoopField
+  sleep, 1000
+  send, {esc}
+  sleep, 150
+  ControlClick, x1630 y740, %Title%,, Left, 1, NA
+  sleep, 800
+}
+send, {esc}
+ControlClick, x1300 y951, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 50
+send, %MapsLink%
+sleep, 50
+If (ValP > 0)
+{
+ControlClick, x590 y652, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 100
+send, %ValP%
+sleep, 100
+send, {tab}
+sleep, 100
+ControlClick, x399 y721, %Title%,, Left, 2, NA
+sleep, 100
+send, ^{a}
+sleep, 50
+send, {del}
+sleep, 100
+send, %LinkPed%
+sleep, 150
+}
+ControlClick, x1621 y914, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 50
+send, 1
+sleep, 100
+send, {tab}
+sleep, 100
+ControlClick, x1160 y570, %Title%,, Left, 2, NA
+sleep, 80
+send, ^{a}
+sleep, 50
+send, %KmMaps%
+sleep, 100
+ControlClick, x920 y500, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x1598 y500, %Title%,, Left, 2, NA
+}
+WinActivate, ahk_exe DDSLogistica.exe
+WinWaitActive, ahk_exe DDSLogistica.exe
+sleep, 350
+if CicloPm = 1
+{
+ControlClick, x1593 y363, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x920 y500, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x1598 y500, %Title%,, Left, 2, NA
+}
+If (OBS != 0)
+{
+ControlClick, x827 y845, %Title%,, Left, 1, NA
+sleep, 80
+send, {space}
+send, - %OBS%
+}
+sleep, 1000
+ControlClick, x347 y224, %Title%,, Left, 1, NA
+sleep, 250
+Send, {Enter}
+Loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 32, 64, 71, 99, 0x0882D8, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+sleep, 150
+send, {space}
+sleep, 650
+ControlClick, x523 y191, %Title%,, Left, 2, NA
+sleep, 500
+WinActivate, ahk_exe EXCEL.EXE
+sleep, 50
+WinActivate, ahk_exe EXCEL.EXE
+sleep, 100
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Down}
+ClipBoard := "`r`n"
+}
+Return
+
+MouseOn:
+  Loop
+  {
+  Gui, ProgramGui: Submit, NoHide
+  NomeMotorista := "`r`n"
+  Destino := "`r`n"
+  LinkStrava := "`r`n"
+  ValKm := "`r`n"
+  ValP := "`r`n"
+  LinkPed := "`r`n"
+  KmMaps := "`r`n"
+  MapsLink := "`r`n"
+  NotValid := 0
+  Nfs := 0
+  OBS := 0
+  EvDivergente := 0
+  sleep, 70
+  send, ^{c}
+  sleep, 100
+  NomeMotorista := ClipBoard
+  sleep, 50
+  if (NomeMotorista = "`r`n")
+  {
+  break
+  }
+  sleep, 50
+  send, {Right}
+  sleep, 100
+  send, ^{c}
+  sleep, 100
+  Destino := ClipBoard
+  sleep, 100
+  ClipBoard := "`r`n"
+  sleep, 100
+  send, {right}
+  sleep, 100
+  send, ^{c}
+  sleep, 100
+  if (Clipboard = "`r`n")
+  {
+  OBS := 0
+  }
+  else if (ClipBoard !="`r`n")
+  {
+  OBS := ClipBoard
+  }
+Sleep, 50
+ClipBoard := "`r`n"
+sleep, 100
+send, {right}
+sleep, 100
+send, ^{c}
+clipwait
+sleep, 100
+if (ClipBoard = "`r`n")
+{
+Nfs := 1
+}
+else if (Clipboard != "`r`n")
+{
+Nfs := 0
+sleep, 20
+LinkStrava := ClipBoard
+sleep, 100
+ClipBoard := "`r`n"
+sleep, 100
+send, {right}
+sleep, 100
+send, ^{c}
+clipwait
+sleep, 100
+ValKm := ClipBoard
+sleep, 100
+if (ValKm = "`r`n")
+{
+EvDivergente := 1
+}
+}
+ClipBoard := "`r`n"
+sleep, 50
+WinActivate, ahk_exe DDSLogistica.exe
+WinWaitActive, ahk_exe DDSLogistica.exe
+sleep, 200
+WinGetTitle, Title, A
+loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 1039, 224, 1110, 240, 0x6782B6, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+  send, {click, 1096, 259}
+  sleep, 100
+  Loop, Parse, % StrSplit(NomeMotorista,"/").1
+{
+  Send, % A_LoopField
+  Sleep, 100
+}
+send, {esc}
+sleep, 250
+send, {click, 1520, 406}
+sleep, 250
+send, {click, 344, 521}
+loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 357, 208, 388, 239, 0xD23D26, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+sleep, 500
+send, {click,  1180, 739}
+sleep, 800
+Loop, Parse, UF, `/
+{
+  Send, % A_LoopField
+  Sleep, 150
+}
+sleep, 150
+send, {TAB}
+sleep, 100
+Loop, Parse, Destino, `/
+if (A_LoopField !="`r`n")
+{
+  send, {click, 1379, 746, 2}
+  sleep, 1000
+  Send, % A_LoopField
+  sleep, 1000
+  send, {esc}
+  sleep, 150
+  send, {click,  1639, 740}
+  sleep, 800
+}
+send, {esc}
+sleep, 400
+send, {click, 667, 425}
+if (Nfs = 0)
+{
+if (EvDivergente = 1)
+{
+send, {click, 1630, 913, 2}
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 100
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+if (clipboard = 0) or (clipboard = "`r`n")
+{
+msgbox, destino incorreto ou tem que roteirizar, lembra de olhar outras minutas com o mesmo destino
+pause
+send, {click, 1630, 913, 2}
+sleep, 100
+send, ^{a}
+sleep, 100
+send, ^{c}
+ClipWait
+continue
+}
+sleep, 50
+KmDiv := StrSplit(ClipBoard,",").1
+sleep, 150
+ValKm := KmDiv
+}
+send, {click, 469, 948, 2}
+sleep, 200
+send, ^{a}
+sleep, 50
+send, %LinkStrava%
+sleep, 200
+send, {click, 1166, 569, 2}
+sleep, 100
+send, ^{a}
+sleep, 50
+send, %ValKm%
+sleep, 100
+send, {click, 920, 500, 2}
+sleep, 150
+send, {click, 1598, 500, 2}
+sleep, 200
+GoSub, VerificarFaixaValKm
+sleep, 50
+Gosub, VerificarFaixaKmMaps
+sleep, 50
+Gosub, ComparativoFaixas
+sleep, 180
+if (NotValid = 1)
+{
+send, {click, 827, 845}
+sleep, 80
+send, -Strava desconsiderado pois nao atinge o km 
+sleep, 50
+send, {space}
+sleep, 50
+send, %LinkStrava%
+sleep, 80
+send, {click, 469, 948, 2}
+sleep, 80
+send, ^{a}
+sleep, 50
+send, {del}
+sleep, 80
+send, {click, 1166, 569, 2}
+sleep, 80
+send, ^{a}
+sleep, 50
+send, {del}
+}
+}
+if (Nfs = 1)
+{
+send, {click, 920, 500, 2}
+sleep, 150
+send, {click, 590, 652, 2}
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+PVal := StrSplit(ClipBoard,",").1
+sleep, 25
+if (PVal > 0)
+{
+ValP := ClipBoard
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 50
+send, {click, 399, 721, 2}
+sleep, 50
+send, ^{a}
+sleep, 80
+send, ^{c}
+ClipWait
+LinkPed := ClipBoard
+sleep, 50
+ClipBoard := "`r`n"
+}
+sleep, 50
+send, {click, 1630, 913, 2}
+sleep, 50
+ClipBoard := "`r`n"
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+KmMaps := ClipBoard
+Sleep, 50
+ClipBoard := "`r`n"
+sleep, 80
+send, {click, 1300, 951, 2}
+sleep, 100
+send, ^{a}
+sleep, 50
+send, ^{c}
+clipwait
+MapsLink := ClipBoard
+sleep, 50
+ClipBoard= "`r`n"
+sleep, 800
+send, {click, 1180, 739}
+sleep, 500
+Loop, Parse, UF, `/
+{
+  Send, % A_LoopField
+  Sleep, 150
+}
+sleep, 150
+send, {ESC}
+sleep, 100
+DestinoNfs := "Não Fez Strava"
+Loop, Parse, DestinoNfs, `/
+if (A_LoopField !="`r`n")
+{
+  send, {click, 1379, 746, 2}
+  sleep, 1000
+  Send, % A_LoopField
+  sleep, 1000
+  send, {esc}
+  sleep, 150
+  send, {click, 1630, 740}
+  sleep, 800
+}
+send, {esc}
+send, {click, 1300, 951, 2}
+sleep, 50
+send, ^{a}
+sleep, 50
+send, %MapsLink%
+sleep, 50
+If (ValP > 0)
+{
+send, {click, 590, 652, 2}
+sleep, 50
+send, ^{a}
+sleep, 100
+send, %ValP%
+sleep, 100
+send, {tab}
+sleep, 100
+send, {click, 399, 721, 2}
+sleep, 100
+send, ^{a}
+sleep, 50
+send, {del}
+sleep, 100
+send, %LinkPed%
+sleep, 150
+}
+send, {click, 1621, 914, 2}
+sleep, 50
+send, ^{a}
+sleep, 50
+send, 1
+sleep, 100
+send, {tab}
+sleep, 100
+send, {click, 1160, 570, 2}
+sleep, 80
+send, ^{a}
+sleep, 50
+send, %KmMaps%
+sleep, 100
+send, {click, 920, 500, 2}
+sleep, 150
+send, {click, 1598, 500, 2}
+}
+WinActivate, ahk_exe DDSLogistica.exe
+WinWaitActive, ahk_exe DDSLogistica.exe
+sleep, 350
+if CicloPm = 1
+{
+send, {click, 1593, 363, 2}
+sleep, 150
+send, {click, 920, 500, 2}
+sleep, 150
+send, {click, 1598, 500, 2}
+}
+If (OBS != 0)
+{
+send, {click, 827, 845}
+sleep, 80
+send, {space}
+send, - %OBS%
+}
+sleep, 1000
+send, {click, 347, 224}
+sleep, 250
+Send, {Enter}
+Loop
+{
+  CoordMode, Pixel, Relative
+  PixelSearch, X, Y, 32, 64, 71, 99, 0x0882D8, 20, Fast RGB
+  if errorlevel = 0
+  break
+}
+sleep, 150
+send, {space}
+sleep, 650
+send, {click, 523, 191, 2}
+sleep, 500
+WinActivate, ahk_exe EXCEL.EXE
+sleep, 50
+WinActivate, ahk_exe EXCEL.EXE
+sleep, 100
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Left}
+sleep, 50
+send, {Down}
+ClipBoard := "`r`n"
+}
+Return
+
+VerificarFaixaValKm:
+ValKm := StrSplit(ValKm,",").1
+sleep, 150
+if (Valkm > 399)
+{
+MsgBox, 4,, Certeza que o cara rodou mais de 400km?
+IfMsgBox Yes
+    ValkmFaixa = 8
+else
+    Pause
+}
+else if (ValKm >= 351)
+{
+ValkmFaixa = 7
+}
+else if (ValKm >= 301)
+{
+ValkmFaixa = 6
+}
+else if (ValKm >= 251)
+{
+ValkmFaixa = 5
+}
+else if (ValKm >= 201)
+{
+ValkmFaixa = 4
+}
+else if (ValKm >= 151)
+{
+ValkmFaixa = 3
+}
+else if (ValKm >= 101)
+{
+ValkmFaixa = 2
+}
+else if (ValKm <= 100)
+{
+ValkmFaixa = 1
+}
+return
+
+
+VerificarFaixaKmMaps:
+loop
+{
+sleep, 5000
+ControlClick, x1630 y913, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 150
+KmMaps := StrSplit(ClipBoard,",").1
+sleep, 150
+if (KmMaps = 0) or (KmMaps = "`r`n")
+{
+msgbox, destino incorreto ou tem que roteirizar, lembra de olhar outras minutas com o mesmo destino
+pause
+ControlClick, x1630 y913, %Title%,, Left, 2, NA
+sleep, 50
+send, ^{a}
+sleep, 50
+send, ^{c}
+ClipWait
+sleep, 50
+KmMaps := StrSplit(ClipBoard,",").1
+ControlClick, x920 y500, %Title%,, Left, 2, NA
+sleep, 150
+ControlClick, x1598 y500, %Title%,, Left, 2, NA
+continue
+}
+else if (KmMaps >= 400)
+{
+KmMapsFaixa = 8
+break
+}
+else if (KmMaps >= 351)
+{
+KmMapsFaixa = 7
+break
+}
+else if (KmMaps >= 301)
+{
+KmMapsFaixa = 6
+break
+}
+else if (KmMaps >= 251)
+{
+KmMapsFaixa = 5
+break
+}
+else if (KmMaps >= 201)
+{
+KmMapsFaixa = 4
+break
+}
+else if (KmMaps >= 151)
+{
+KmMapsFaixa = 3
+break
+}
+else if (KmMaps >= 101)
+{
+KmMapsFaixa = 2
+break
+}
+else if (KmMaps <= 100)
+{
+KmMapsFaixa = 1
+break
+}
+}
+return
+
+
+ComparativoFaixas:
+If (ValkmFaixa < KmMapsFaixa)
+{
+Nfs := 1
+NotValid := 1
+}
+Return
+
+Rel:
+GuiControlGet, CtrlContents,, vUF
+IniWrite, %UF%, %A_ScriptName%, Settings, iniUF
+Reload
+Return
+
+/*
+[Settings]
+iniUF=mg
+*/
