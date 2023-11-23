@@ -1,4 +1,4 @@
-global scriptVersion := 4.6
+global scriptVersion := 4.7
 
 AutoUpdate()
 
